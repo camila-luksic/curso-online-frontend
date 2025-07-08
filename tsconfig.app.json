@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler", // mantén esta configuración si usas un bundler (Vite, Webpack)
+    "allowImportingTsExtensions": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    /* Path Mapping */
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"],
+      "@features/*": ["features/*"],
+      "@components/*": ["components/*"],
+      "@shared/*": ["shared/*"],
+      "@lib/*": ["lib/*"],
+      "@providers/*": ["providers/*"]
+    }
+  },
+  "include": ["src"]
+}
