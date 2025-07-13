@@ -1,0 +1,63 @@
+{
+    "users": {
+        "admin": {
+            "email": "admin@test.com",
+            "password": "admin123",
+            "name": "Admin User",
+            "role": "ADMIN"
+        },
+        "teacher": {
+            "email": "profesor@test.com",
+            "password": "profesor123",
+            "name": "Teacher User",
+            "role": "PROF"
+        },
+        "student": {
+            "email": "estudiante@test.com",
+            "password": "estudiante123",
+            "name": "Student User",
+            "role": "EST"
+        }
+    },
+    "courses": {
+        "testCourse": {
+            "title": "Test Course",
+            "description": "This is a test course for automated testing",
+            "category": "Programming",
+            "videos": [
+                {
+                    "title": "Introduction Video",
+                    "url": "https://example.com/intro.mp4",
+                    "description": "Welcome to the course"
+                },
+                {
+                    "title": "Lesson 1",
+                    "url": "https://example.com/lesson1.mp4",
+                    "description": "First lesson content"
+                }
+            ]
+        }
+    },
+    "categories": {
+        "programming": {
+            "name": "Programming",
+            "description": "Programming and software development courses"
+        },
+        "design": {
+            "name": "Design",
+            "description": "Graphic design and UI/UX courses"
+        }
+    },
+    "roles": {
+        "testRole": {
+            "name": "TEST_ROLE",
+            "description": "Test role for automated testing"
+        }
+    },
+    "grades": {
+        "testGrade": {
+            "value": 85,
+            "comment": "Good work on the assignment"
+        }
+    }
+}

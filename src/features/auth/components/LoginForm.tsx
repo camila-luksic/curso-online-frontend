@@ -28,6 +28,7 @@ export const LoginForm = () => {
                     type="email"
                     label="Email"
                     placeholder="tu@email.com"
+                    data-cy="email-input"
                     {...register('email')}
                     error={errors.email?.message}
                 />
@@ -38,13 +39,14 @@ export const LoginForm = () => {
                     type="password"
                     label="Password"
                     placeholder="••••••••"
+                    data-cy="password-input"
                     {...register('password')}
                     error={errors.password?.message}
                 />
             </div>
 
             {error && (
-                <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
+                <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md" data-cy="error-message">
                     {error}
                 </div>
             )}
@@ -55,6 +57,7 @@ export const LoginForm = () => {
                 size="lg"
                 className="w-full"
                 disabled={loading}
+                data-cy="login-button"
             >
                 {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </Button>

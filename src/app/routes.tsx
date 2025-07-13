@@ -1,50 +1,59 @@
 import { ProtectedRoute } from '@/core/components/ProtectedRoute';
-import LoginPage from '@/features/auth/pages/LoginPage';
-import RegisterPage from '@/features/auth/pages/RegisterPage';
-import CategoryListPage from '@/features/categories/pages/CategoryListPage';
-import { AdminLayout } from '@/layouts/AdminLayout';
 import { PublicLayout } from '@/layouts/PublicLayout';
 import { useRoutes } from 'react-router-dom';
-import CursoListPage from '../features/courses/pages/CursoListPage';
-import VideoDetailPage from '../features/courses/pages/VideoDetailPage';
+import { Suspense, lazy } from 'react';
+import { LoadingSpinner } from '@/core/components/ui/LoadingSpinner';
 
-import AdminDashboardPage from '../features/admin/AdminDashboardPage';
-import { CourseDetailRouter } from '../features/courses/components/CourseDetailRouter';
-import CursoPublicListPage from '../features/home/components/CursoPublicListPage';
-import HomePage from '../features/home/pages/HomePage';
-import NotasGestionPage from '../features/notas/pages/NotasGestionPage';
-import RoleListPage from '../features/roles/pages/RoleListPage';
-import StudentDashboardPage from '../features/students/StudentDashboardPage';
-import TeacherDashboardPage from '../features/teachers/TeacherDashboardPage';
-import UserListPage from '../features/users/pages/UserListPage';
-import { StudentLayout } from '../layouts/StudentLayout';
-import TeacherLayout from '../layouts/TeacherLayout';
-// ...otros imports
+const HomePage = lazy(() => import('@/features/home/pages/HomePage'));
+const LoginPage = lazy(() => import('@/features/auth/pages/LoginPage'));
+const RegisterPage = lazy(() => import('@/features/auth/pages/RegisterPage'));
+const CursoListPage = lazy(() => import('@/features/courses/pages/CursoListPage'));
+const VideoDetailPage = lazy(() => import('@/features/courses/pages/VideoDetailPage'));
+const AdminDashboardPage = lazy(() => import('@/features/admin/AdminDashboardPage'));
+const StudentDashboardPage = lazy(() => import('@/features/students/StudentDashboardPage'));
+const TeacherDashboardPage = lazy(() => import('@/features/teachers/TeacherDashboardPage'));
+const CategoryListPage = lazy(() => import('@/features/categories/pages/CategoryListPage'));
+const RoleListPage = lazy(() => import('@/features/roles/pages/RoleListPage'));
+const UserListPage = lazy(() => import('@/features/users/pages/UserListPage'));
+const CursoPublicListPage = lazy(() => import('@/features/home/components/CursoPublicListPage'));
+const NotasGestionPage = lazy(() => import('@/features/notas/pages/NotasGestionPage'));
+const CourseDetailRouter = lazy(() => import('@/features/courses/components/CourseDetailRouter'));
+
+import { AdminLayout } from '@/layouts/AdminLayout';
+import { StudentLayout } from '@/layouts/StudentLayout';
+import TeacherLayout from '@/layouts/TeacherLayout';
+
+const LazyRoute = (Component: React.LazyExoticComponent<any>) => (
+  <Suspense fallback={
+    <div className="flex justify-center items-center h-screen">
+      <LoadingSpinner size="xl" text="Cargando..." />
+    </div>
+  }>
+    <Component />
+  </Suspense>
+);
 
 export default function AppRoutes() {
   return useRoutes([
     {
       element: <PublicLayout />,
       children: [
-        { path: '/', element: <HomePage /> },
-        { path: '/login', element: <LoginPage /> },
-        { path: '/register', element: <RegisterPage /> },
-        { path: '/cursos', element: <CursoPublicListPage /> },
-        // { path: '/cursos/:id', element: <CourseDetailRouter /> }, // Quitado del PublicLayout
+        { path: '/', element: LazyRoute(HomePage) },
+        { path: '/login', element: LazyRoute(LoginPage) },
+        { path: '/register', element: LazyRoute(RegisterPage) },
+        { path: '/cursos', element: LazyRoute(CursoPublicListPage) },
       ],
     },
-    // Rutas para usuarios autenticados
-    { path: '/cursos/:cursoId/videos/:videoId', element: <VideoDetailPage /> },
-    { path: '/cursos/:id', element: <CourseDetailRouter /> }, // Agregado al nivel raíz
+    { path: '/cursos/:cursoId/videos/:videoId', element: LazyRoute(VideoDetailPage) },
+    { path: '/cursos/:id', element: LazyRoute(CourseDetailRouter) }, // Agregado al nivel raíz
     {
       path: '/cursos/:cursoId/gestion-notas',
       element: (
         <ProtectedRoute allowedRoles={['ADMIN', 'PROF']}>
-          <NotasGestionPage />
+          {LazyRoute(NotasGestionPage)}
         </ProtectedRoute>
       )
     },
-    // Dashboards o layouts específicos por rol
     {
       path: '/admin',
       element: (
@@ -53,14 +62,12 @@ export default function AppRoutes() {
         </ProtectedRoute>
       ),
       children: [
-        { index: true, element: <AdminDashboardPage /> },
-        { path: 'dashboard', element: <AdminDashboardPage /> },
-        { path: 'categorias', element: <CategoryListPage /> },
-        { path: 'roles', element: <RoleListPage /> },
-        { path: 'usuarios', element: <UserListPage /> },
-        { path: 'cursos', element: <CursoListPage /> },
-
-        // ...otras rutas de gestión solo para admin
+        { index: true, element: LazyRoute(AdminDashboardPage) },
+        { path: 'dashboard', element: LazyRoute(AdminDashboardPage) },
+        { path: 'categorias', element: LazyRoute(CategoryListPage) },
+        { path: 'roles', element: LazyRoute(RoleListPage) },
+        { path: 'usuarios', element: LazyRoute(UserListPage) },
+        { path: 'cursos', element: LazyRoute(CursoListPage) },
       ],
     },
     {
@@ -71,11 +78,10 @@ export default function AppRoutes() {
         </ProtectedRoute>
       ),
       children: [
-        { index: true, element: <StudentDashboardPage /> },
-        { path: 'dashboard', element: <StudentDashboardPage /> },
-        { path: 'mis-cursos', element: <CursoListPage onlyMyCourses /> },
-        { path: 'cursos', element: <CursoListPage /> },
-
+        { index: true, element: LazyRoute(StudentDashboardPage) },
+        { path: 'dashboard', element: LazyRoute(StudentDashboardPage) },
+        { path: 'mis-cursos', element: LazyRoute(CursoListPage) },
+        { path: 'cursos', element: LazyRoute(CursoListPage) },
       ],
     },
     {
@@ -86,11 +92,11 @@ export default function AppRoutes() {
         </ProtectedRoute>
       ),
       children: [
-        { index: true, element: <TeacherDashboardPage /> },
-        { path: 'dashboard', element: <TeacherDashboardPage /> },
-        { path: 'cursos', element: <CursoListPage /> },
+        { index: true, element: LazyRoute(TeacherDashboardPage) },
+        { path: 'dashboard', element: LazyRoute(TeacherDashboardPage) },
+        { path: 'cursos', element: LazyRoute(CursoListPage) },
       ],
     },
-    { path: '*', element: <HomePage /> }
+    { path: '*', element: LazyRoute(HomePage) }
   ]);
 }
