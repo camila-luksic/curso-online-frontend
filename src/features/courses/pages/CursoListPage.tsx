@@ -19,7 +19,6 @@ function flattenCurso(curso: Curso) {
 }
 
 export default function CursoListPage({ onlyMyCourses = false }: { onlyMyCourses?: boolean }) {
-    // Si es "mis cursos", usar useMisCursos y mapear a cursos
     const { data: cursosRaw = [], isLoading } = onlyMyCourses
         ? useMisCursos()
         : useCursos();
@@ -31,7 +30,6 @@ export default function CursoListPage({ onlyMyCourses = false }: { onlyMyCourses
 
     let cursosFiltrados: Curso[] = [];
     if (onlyMyCourses) {
-        // cursosRaw es Inscripcion[]
         cursosFiltrados = (cursosRaw as Inscripcion[]).map(insc => ({
             ...insc.curso,
             imagenUrl: insc.curso.imagenUrl ?? '',
@@ -39,7 +37,6 @@ export default function CursoListPage({ onlyMyCourses = false }: { onlyMyCourses
             profesor: { id: insc.curso.profesorId, nombre: '', apellido: '' },
         }));
     } else {
-        // cursosRaw es Curso[]
         cursosFiltrados = (cursosRaw as Curso[]).filter((c: Curso) => ability.can('read', subject('Curso', flattenCurso(c) as any)));
     }
 
@@ -81,7 +78,6 @@ export default function CursoListPage({ onlyMyCourses = false }: { onlyMyCourses
 
     return (
         <div className="max-w-6xl mx-auto py-8">
-            {/* Mostrar error si existe */}
             {error && (
                 <div className="mb-4">
                     <ErrorMessage message={error} />
