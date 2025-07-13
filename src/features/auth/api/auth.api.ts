@@ -21,7 +21,7 @@ export const authApi = {
 
   // Get current user
   getCurrentUser: async (): Promise<LoginResponse> => {
-    const { data } = await apiInstance.get('/auth/me');
+    const { data } = await apiInstance.get('/usuarios/me');
     return data;
   },
 };
