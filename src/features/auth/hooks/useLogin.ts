@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../core/hooks/useAuth';
+import { useNotifications } from '../../../core/hooks/useNotifications';
 import type { LoginFormData } from '../types/auth.types';
 
 export const useLogin = () => {
@@ -9,6 +10,7 @@ export const useLogin = () => {
   const { login, usuario } = useAuth();
   const navigate = useNavigate();
   const [shouldRedirect, setShouldRedirect] = useState(false);
+  const { showSuccess, showError } = useNotifications();
 
   const handleLogin = useCallback(async (credentials: LoginFormData) => {
     setLoading(true);
@@ -17,12 +19,15 @@ export const useLogin = () => {
       await login(credentials.email, credentials.password);
       setShouldRedirect(true);
       setError(null);
+      showSuccess('¡Inicio de sesión exitoso!');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Error al iniciar sesión');
+      const errorMessage = err.response?.data?.error || 'Error al iniciar sesión';
+      setError(errorMessage);
+      showError(errorMessage);
     } finally {
       setLoading(false);
     }
-  }, [login]);
+  }, [login, showSuccess, showError]);
 
   useEffect(() => {
     if (shouldRedirect && usuario) {
