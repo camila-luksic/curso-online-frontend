@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { LoadingSpinner } from '@/core/components/ui/LoadingSpinner';
 import { EditableGradeCell } from './EditableGradeCell';
 import { useNotas } from '../hooks/useNotas';
@@ -11,12 +10,6 @@ interface GradesTableProps {
 }
 
 export const GradesTable = ({ inscripciones, tiposNota }: GradesTableProps) => {
-    const [refreshKey, setRefreshKey] = useState(0);
-
-    const handleGradeChange = () => {
-        setRefreshKey(prev => prev + 1);
-    };
-
     if (inscripciones.length === 0) {
         return (
             <div className="text-center py-8">
@@ -82,7 +75,6 @@ export const GradesTable = ({ inscripciones, tiposNota }: GradesTableProps) => {
                                 key={inscripcion.id}
                                 inscripcion={inscripcion}
                                 tiposNota={tiposNota}
-                                onGradeChange={handleGradeChange}
                             />
                         ))}
                     </tbody>
@@ -95,10 +87,9 @@ export const GradesTable = ({ inscripciones, tiposNota }: GradesTableProps) => {
 interface StudentGradeRowProps {
     inscripcion: Inscripcion;
     tiposNota: TipoNota[];
-    onGradeChange: () => void;
 }
 
-const StudentGradeRow = ({ inscripcion, tiposNota, onGradeChange }: StudentGradeRowProps) => {
+const StudentGradeRow = ({ inscripcion, tiposNota }: StudentGradeRowProps) => {
     const { data: notas, isLoading } = useNotas(inscripcion.id);
 
     if (isLoading) {
@@ -144,7 +135,6 @@ const StudentGradeRow = ({ inscripcion, tiposNota, onGradeChange }: StudentGrade
                             inscripcionId={inscripcion.id}
                             tipoNotaId={tipo.id}
                             valorInicial={nota?.valor || null}
-                            onValueChange={onGradeChange}
                         />
                     </td>
                 );
