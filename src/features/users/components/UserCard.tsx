@@ -4,9 +4,10 @@ interface UserCardProps {
     user: User;
     onEdit?: () => void;
     onDelete?: () => void;
+    onChangePassword?: () => void;
 }
 
-export function UserCard({ user, onEdit, onDelete }: UserCardProps) {
+export function UserCard({ user, onEdit, onDelete, onChangePassword }: UserCardProps) {
     return (
         <div className="bg-white dark:bg-neutral-900 rounded shadow p-4 flex flex-col gap-2 border border-neutral-200 dark:border-neutral-700">
             <div className="flex items-center gap-2 mb-2">
@@ -17,6 +18,9 @@ export function UserCard({ user, onEdit, onDelete }: UserCardProps) {
             <div className="flex gap-2 mt-2">
                 {onEdit && (
                     <button className="btn btn-primary" onClick={onEdit} aria-label="Editar usuario">Editar</button>
+                )}
+                {onChangePassword && (
+                    <button className="btn btn-secondary" onClick={onChangePassword} aria-label="Cambiar contraseña">Cambiar Contraseña</button>
                 )}
                 {onDelete && (
                     <button className="btn btn-danger" onClick={onDelete} aria-label="Eliminar usuario">Eliminar</button>
