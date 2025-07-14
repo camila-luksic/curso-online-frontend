@@ -25,4 +25,8 @@ export async function updateUser(id: number, input: UpdateUserInput): Promise<Us
 
 export async function deleteUser(id: number): Promise<void> {
   await apiInstance.delete(`${API_URL}/${id}`);
+}
+
+export async function updatePassword(id: number, newPassword: string): Promise<void> {
+  await apiInstance.patch(`${API_URL}/${id}/password`, { newPassword });
 } 

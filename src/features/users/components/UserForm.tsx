@@ -4,8 +4,6 @@ import * as z from 'zod';
 import { useRoles } from '../../roles/hooks/useRoles';
 import { userSchema } from '../schema/userSchema';
 
-
-
 export type UserFormValues = z.infer<typeof userSchema>;
 
 interface UserFormProps {
@@ -46,11 +44,13 @@ export function UserForm({ initialValues, onSubmit, loading, isEdit }: UserFormP
                 <input type="email" {...register('email')} className="input input-bordered w-full" data-cy="email-input" />
                 {errors.email && <span className="text-accent text-sm">{errors.email.message}</span>}
             </div>
-            <div>
-                <label className="text-black dark:text-white">Contraseña {isEdit && <span className="text-xs text-neutral-400">(dejar vacío para no cambiar)</span>}</label>
-                <input type="password" {...register('password')} className="input input-bordered w-full" autoComplete="new-password" data-cy="password-input" />
-                {errors.password && <span className="text-accent text-sm">{errors.password.message}</span>}
-            </div>
+            {!isEdit && (
+                <div>
+                    <label className="text-black dark:text-white">Contraseña</label>
+                    <input type="password" {...register('password')} className="input input-bordered w-full" autoComplete="new-password" data-cy="password-input" />
+                    {errors.password && <span className="text-accent text-sm">{errors.password.message}</span>}
+                </div>
+            )}
             <div>
                 <label className="text-black dark:text-white">Rol</label>
                 <select {...register('rolId', { valueAsNumber: true })} className="input input-bordered w-full" data-cy="rol-select">
