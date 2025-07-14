@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Check, X, Clock } from 'lucide-react';
 import { useAsignarNota } from '../hooks/useAsignarNota';
+import { useUpdateNota } from '../hooks/useUpdateNota';
+import { useNotas } from '../hooks/useNotas';
 
 interface EditableGradeCellProps {
     inscripcionId: number;
@@ -20,6 +22,10 @@ export const EditableGradeCell = ({
     const [isValid, setIsValid] = useState(true);
     const inputRef = useRef<HTMLInputElement>(null);
     const asignarNota = useAsignarNota(inscripcionId);
+    const { data: notas } = useNotas(inscripcionId);
+    // Buscar la nota existente para este tipoNotaId
+    const notaExistente = notas?.find(n => n.tipoNota.id === tipoNotaId);
+    const updateNota = useUpdateNota(notaExistente?.id ?? 0, inscripcionId);
 
     const validateValue = (val: string): boolean => {
         const num = parseFloat(val);
@@ -38,10 +44,14 @@ export const EditableGradeCell = ({
         }
 
         const numValue = parseFloat(value);
-        await asignarNota.mutateAsync({
-            tipoNotaId,
-            valor: numValue
-        });
+        if (notaExistente) {
+            await updateNota.mutateAsync({ valor: numValue });
+        } else {
+            await asignarNota.mutateAsync({
+                tipoNotaId,
+                valor: numValue
+            });
+        }
 
         setIsEditing(false);
         onValueChange?.(numValue);
@@ -77,13 +87,22 @@ export const EditableGradeCell = ({
     }, [isEditing]);
 
     const getStatusIcon = () => {
-        if (asignarNota.isPending) {
+        if (notaExistente && updateNota.isPending) {
             return <Clock className="w-4 h-4 text-yellow-500 animate-spin" />;
         }
-        if (asignarNota.isSuccess) {
+        if (notaExistente && updateNota.isSuccess) {
             return <Check className="w-4 h-4 text-green-500" />;
         }
-        if (asignarNota.isError) {
+        if (notaExistente && updateNota.isError) {
+            return <X className="w-4 h-4 text-red-500" />;
+        }
+        if (!notaExistente && asignarNota.isPending) {
+            return <Clock className="w-4 h-4 text-yellow-500 animate-spin" />;
+        }
+        if (!notaExistente && asignarNota.isSuccess) {
+            return <Check className="w-4 h-4 text-green-500" />;
+        }
+        if (!notaExistente && asignarNota.isError) {
             return <X className="w-4 h-4 text-red-500" />;
         }
         return null;

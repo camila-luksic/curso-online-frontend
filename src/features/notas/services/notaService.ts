@@ -9,4 +9,9 @@ export const getNotas = async (inscripcionId: number): Promise<NotasResponse> =>
 export const asignarNota = async (inscripcionId: number, input: CreateNotaInput): Promise<Nota> => {
   const { data } = await apiInstance.post<Nota>(`/inscripciones/${inscripcionId}/notas`, input);
   return data;
+};
+
+export const updateNota = async (notaId: number, input: Partial<CreateNotaInput>): Promise<Nota> => {
+  const { data } = await apiInstance.patch<Nota>(`/notas/${notaId}`, input);
+  return data;
 }; 
