@@ -33,6 +33,17 @@ const LazyRoute = (Component: React.LazyExoticComponent<any>) => (
   </Suspense>
 );
 
+// Wrapper para CursoListPage con props
+const CursoListPageWrapper = ({ onlyMyCourses }: { onlyMyCourses: boolean }) => (
+  <Suspense fallback={
+    <div className="flex justify-center items-center h-screen">
+      <LoadingSpinner size="xl" text="Cargando..." />
+    </div>
+  }>
+    <CursoListPage onlyMyCourses={onlyMyCourses} />
+  </Suspense>
+);
+
 export default function AppRoutes() {
   return useRoutes([
     {
@@ -67,7 +78,7 @@ export default function AppRoutes() {
         { path: 'categorias', element: LazyRoute(CategoryListPage) },
         { path: 'roles', element: LazyRoute(RoleListPage) },
         { path: 'usuarios', element: LazyRoute(UserListPage) },
-        { path: 'cursos', element: LazyRoute(CursoListPage) },
+        { path: 'cursos', element: <CursoListPageWrapper onlyMyCourses={false} /> },
       ],
     },
     {
@@ -80,8 +91,14 @@ export default function AppRoutes() {
       children: [
         { index: true, element: LazyRoute(StudentDashboardPage) },
         { path: 'dashboard', element: LazyRoute(StudentDashboardPage) },
-        { path: 'mis-cursos', element: LazyRoute(CursoListPage) },
-        { path: 'cursos', element: LazyRoute(CursoListPage) },
+        {
+          path: 'mis-cursos',
+          element: <CursoListPageWrapper onlyMyCourses={true} />
+        },
+        {
+          path: 'cursos',
+          element: <CursoListPageWrapper onlyMyCourses={false} />
+        },
       ],
     },
     {
@@ -94,7 +111,7 @@ export default function AppRoutes() {
       children: [
         { index: true, element: LazyRoute(TeacherDashboardPage) },
         { path: 'dashboard', element: LazyRoute(TeacherDashboardPage) },
-        { path: 'cursos', element: LazyRoute(CursoListPage) },
+        { path: 'cursos', element: <CursoListPageWrapper onlyMyCourses={false} /> },
       ],
     },
     { path: '*', element: LazyRoute(HomePage) }
