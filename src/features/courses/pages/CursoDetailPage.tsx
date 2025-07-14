@@ -8,6 +8,7 @@ import { InscribirseButton } from '../../enrollments/components/InscribirseButto
 import { useMisCursos } from '../../enrollments/hooks/useMisCursos';
 import { BarraProgresoCurso } from '../../progreso/components/BarraProgresoCurso';
 import { VideoListForCourse } from '../../videos/components/VideoListForCourse';
+import { CommentsSection } from '../../comments/components/CommentsSection';
 import CursoImageUploadForm from '../components/CursoImageUploadForm';
 import { useCurso } from '../hooks/useCurso';
 
@@ -118,6 +119,11 @@ export default function CursoDetailPage() {
                     <p className="text-yellow-700 font-semibold">Debes inscribirte en el curso para acceder a los videos.</p>
                 </div>
             )}
+
+            {/* Sección de comentarios */}
+            <div className="mt-12">
+                <CommentsSection cursoId={curso.id} />
+            </div>
         </div>
     );
 } 
