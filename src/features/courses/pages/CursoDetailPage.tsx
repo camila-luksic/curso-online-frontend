@@ -9,6 +9,7 @@ import { useMisCursos } from '../../enrollments/hooks/useMisCursos';
 import { BarraProgresoCurso } from '../../progreso/components/BarraProgresoCurso';
 import { VideoListForCourse } from '../../videos/components/VideoListForCourse';
 import { CommentsSection } from '../../comments/components/CommentsSection';
+import { DownloadCertificadoButton } from '../components/DownloadCertificadoButton';
 import CursoImageUploadForm from '../components/CursoImageUploadForm';
 import { useCurso } from '../hooks/useCurso';
 
@@ -31,7 +32,6 @@ export default function CursoDetailPage() {
     if (isLoading || isLoadingMisCursos) return <div>Cargando...</div>;
     if (!curso) return <div>No se encontró el curso.</div>;
 
-    // CASL: instancia aplanada para checks
     const cursoCASL = { ...curso, profesorId: curso.profesorId ?? curso.profesor?.id };
     const puedeSubirImagen = ability.can('upload', subject('Curso', cursoCASL as any));
     const puedeEditar = ability.can('update', subject('Curso', cursoCASL as any));
@@ -95,6 +95,12 @@ export default function CursoDetailPage() {
                     <p className="mb-4">{curso.descripcion}</p>
                     {/* Barra de progreso solo para estudiantes inscritos */}
                     {estaInscrito && <BarraProgresoCurso cursoId={curso.id} />}
+                    {/* Botón de certificado solo para estudiantes inscritos */}
+                    {estaInscrito && (
+                        <div className="mt-4">
+                            <DownloadCertificadoButton cursoId={curso.id} />
+                        </div>
+                    )}
                     <div className="flex gap-2 mt-2">
                         {puedeEditar && (
                             <button className="btn btn-primary" onClick={() => {/* lógica de editar */ }}>Editar</button>

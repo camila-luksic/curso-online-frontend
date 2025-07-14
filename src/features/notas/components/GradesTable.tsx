@@ -104,10 +104,12 @@ const StudentGradeRow = ({ inscripcion, tiposNota }: StudentGradeRowProps) => {
         );
     }
 
-    // Calcular promedio
-    const notasValidas = notas?.filter(nota => nota.valor !== null) || [];
-    const promedio = notasValidas.length > 0
-        ? notasValidas.reduce((sum, nota) => sum + nota.valor, 0) / notasValidas.length
+    const notasDeTiposVisibles = tiposNota.map(tipo =>
+        notas?.find(nota => nota.tipoNota.id === tipo.id)?.valor
+    );
+    const todasLasNotasPresentes = notasDeTiposVisibles.every(v => typeof v === 'number');
+    const promedio = todasLasNotasPresentes
+        ? notasDeTiposVisibles.reduce((sum, v) => sum + (v ?? 0), 0) / notasDeTiposVisibles.length
         : null;
 
     return (
