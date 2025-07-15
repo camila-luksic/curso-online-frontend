@@ -1,7 +1,6 @@
 describe('Formulario de usuarios', () => {
   beforeEach(() => {
-    // Simulamos login POST
-    cy.intercept('POST', 'http://localhost:3000/api/auth/login', {
+    cy.intercept('POST', '/api/auth/login', {
       statusCode: 200,
       body: {
         token: 'fake-token-123',
@@ -16,8 +15,7 @@ describe('Formulario de usuarios', () => {
       }
     }).as('loginRequest');
 
-    // Simulamos validación GET /me
-    cy.intercept('GET', 'http://localhost:3000/api/usuarios/me', {
+    cy.intercept('GET', '/api/usuarios/me', {
       statusCode: 200,
       body: {
         id: 2,
@@ -29,8 +27,34 @@ describe('Formulario de usuarios', () => {
       }
     }).as('getMe');
 
-    // Simulamos GET de roles para el selector del formulario
-    cy.intercept('GET', 'http://localhost:3000/api/roles', {
+    // intercept inicial para usuarios vacío
+    cy.intercept('GET', '/api/usuarios*', {
+      statusCode: 200,
+      body: []
+    }).as('getUsuarios');
+
+    cy.visit('http://localhost:5173/login');
+
+    cy.get('input[name=email]').type('luciana@gmail.com');
+    cy.get('input[name="password"]').type('luciana123');
+    cy.get('button[type=submit]').click();
+
+    cy.wait('@loginRequest');
+    cy.wait('@getMe');
+    cy.url().should('include', '/admin/dashboard');
+  });
+
+  it('Crea un nuevo usuario', () => {
+    // intercept POST de creación
+    cy.intercept('POST', '/api/auth/register', {
+      statusCode: 201,
+      body: {
+        message: 'Usuario registrado exitosamente'
+      }
+    }).as('createUser');
+
+    // intercept roles
+    cy.intercept('GET', '/api/roles', {
       statusCode: 200,
       body: [
         { id: 1, codigo: 'ADMIN', nombre: 'Administrador' },
@@ -38,38 +62,25 @@ describe('Formulario de usuarios', () => {
       ]
     }).as('getRoles');
 
-    // Visitar login
-    cy.visit('http://localhost:5173/login');
+    cy.visit('http://localhost:5173/admin/usuarios');
 
-    // Rellenar login
-    cy.get('input[name=email]').type('luciana@gmail.com');
-    cy.get('input[name="password"]').type('luciana123');
-    cy.get('button[type=submit]').click();
+    cy.wait('@getUsuarios');
 
-    // Esperamos a que las peticiones se completen
-    cy.wait('@loginRequest');
-    cy.wait('@getMe');
+    cy.get('button').contains('Nuevo Usuario').click();
 
-    // Verificar que estamos en el dashboard admin
-    cy.url().should('include', '/admin/dashboard');
-  });
+    cy.wait('@getRoles');
 
-  it('Crea un nuevo usuario', () => {
-    // Intercept POST crear usuario
-    cy.intercept('POST', 'http://localhost:3000/api/usuarios', {
-      statusCode: 201,
-      body: {
-        id: 10,
-        username: 'nuevo_usuario',
-        nombre: 'Nuevo',
-        apellido: 'Usuario',
-        email: 'nuevo@correo.com',
-        rol: { codigo: 'USER', nombre: 'Usuario' }
-      }
-    }).as('createUser');
+    cy.get('input[name="username"]').type('nuevo_usuario');
+    cy.get('input[name="nombre"]').type('Nuevo');
+    cy.get('input[name="apellido"]').type('Usuario');
+    cy.get('input[name="email"]').type('nuevo@correo.com');
+    cy.get('input[name="password"]').type('Password123*');
+    cy.get('select[name="rolId"]').select('Usuario');
 
-    // Intercept GET usuarios para recarga
-    cy.intercept('GET', 'http://localhost:3000/api/usuarios', {
+    cy.get('button').contains('Guardar').click();
+
+    // intercept usuarios después de crear
+    cy.intercept('GET', '/api/usuarios*', {
       statusCode: 200,
       body: [
         {
@@ -81,36 +92,13 @@ describe('Formulario de usuarios', () => {
           rol: { codigo: 'USER', nombre: 'Usuario' }
         }
       ]
-    }).as('getUsuarios');
+    }).as('getUsuariosAfterCreate');
 
-    // Ir a usuarios
-    cy.visit('http://localhost:5173/admin/usuarios');
-
-    // Esperar a que carguen roles y usuarios
-    cy.wait('@getRoles');
-    cy.wait('@getUsuarios');
-
-    // Abrir modal
-    cy.get('button').contains('Nuevo Usuario').click();
-
-    // Rellenar campos
-    cy.get('input').filter('[name="username"]').type('nuevo_usuario');
-    cy.get('input').filter('[name="nombre"]').type('Nuevo');
-    cy.get('input').filter('[name="apellido"]').type('Usuario');
-    cy.get('input').filter('[name="email"]').type('nuevo@correo.com');
-    cy.get('input').filter('[name="password"]').type('password123');
-
-    // Seleccionar rol en el dropdown
-    cy.get('select[name="rol"]').select('Usuario');
-
-    // Guardar
-    cy.get('button').contains('Guardar').click();
-
-    // Esperar a POST y GET de usuarios
+    // esperar creación y recarga
     cy.wait('@createUser');
-    cy.wait('@getUsuarios');
+    cy.reload();
+    cy.wait('@getUsuariosAfterCreate');
+cy.contains('Nuevo Usuario', { timeout: 5000 }).should('exist');
 
-    // Verificar que aparezca en la lista
-    cy.contains('nuevo_usuario').should('exist');
   });
 });

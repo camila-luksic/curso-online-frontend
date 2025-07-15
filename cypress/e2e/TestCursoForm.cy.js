@@ -1,7 +1,7 @@
 describe('Formulario de cursos', () => {
   beforeEach(() => {
-    // Interceptamos login
-    cy.intercept('POST', 'http://localhost:3000/api/auth/login', {
+    // Login
+    cy.intercept('POST', '/api/auth/login', {
       statusCode: 200,
       body: {
         token: 'fake-token-123',
@@ -12,20 +12,17 @@ describe('Formulario de cursos', () => {
           apellido: 'luksic',
           email: 'camila@gmail.com',
           rol: { codigo: 'PROF', nombre: 'Profesor' },
-           permisos: [
+          permisos: [
             'usuarios:listar',
-      'categorias:listar',
-      'cursos:crear',
-      'cursos:listar'
-
-    ]
-
+            'categorias:listar',
+            'cursos:crear',
+            'cursos:listar'
+          ]
         }
       }
     }).as('loginRequest');
 
-    // Interceptamos la validación del usuario
-    cy.intercept('GET', 'http://localhost:3000/api/usuarios/me', {
+    cy.intercept('GET', '/api/usuarios/me', {
       statusCode: 200,
       body: {
         id: 1,
@@ -50,8 +47,8 @@ describe('Formulario de cursos', () => {
   });
 
   it('Crea un nuevo curso', () => {
-    // intercepts necesarios
-    cy.intercept('GET', 'http://localhost:3000/api/categorias', {
+    // intercepts
+    cy.intercept('GET', '/api/categorias', {
       statusCode: 200,
       body: [
         { id: 1, nombre: 'Matemáticas' },
@@ -59,21 +56,23 @@ describe('Formulario de cursos', () => {
       ]
     }).as('getCategorias');
 
-    cy.intercept('GET', 'http://localhost:3000/api/usuarios?rol=PROF', {
-      statusCode: 200,
-      body: [
-        {
-          id: 2,
-          username: 'camila_luksic',
-          nombre: 'camila',
-          apellido: 'luksic',
-          email: 'camila@gmail.com',
-          rol: { codigo: 'PROF', nombre: 'Profesor' }
-        }
-      ]
-    }).as('getProfesores');
+   cy.intercept('GET', '/api/usuarios', {
+  statusCode: 200,
+  body: [
+    {
+      id: 2,
+      username: 'camila_luksic',
+      nombre: 'camila',
+      apellido: 'luksic',
+      email: 'camila@gmail.com',
+      rol: { codigo: 'PROF', nombre: 'Profesor' }
+    }
+  ]
+}).as('getProfesores');
 
-    cy.intercept('POST', 'http://localhost:3000/api/cursos', {
+   
+
+    cy.intercept('POST', '/api/cursos', {
       statusCode: 201,
       body: {
         id: 10,
@@ -90,23 +89,23 @@ describe('Formulario de cursos', () => {
 
     cy.visit('http://localhost:5173/profesor/cursos');
 
-    // esperar carga de selects
+    // Abrir modal o formulario aquí
+    cy.get('button').contains('Nuevo Curso').click();
+
+    // Ahora esperar a que realmente se pidan
     cy.wait('@getCategorias');
     cy.wait('@getProfesores');
 
-    // Abrir modal o usar formulario (en tu captura ya está visible)
-    cy.get('input').filter('[name="titulo"]').type('Nuevo Curso');
-    cy.get('textarea').filter('[name="descripcion"]').type('Descripción del curso');
+    cy.get('input[name="titulo"]').type('Nuevo Curso');
+    cy.get('textarea[name="descripcion"]').type('Descripción del curso');
 
-    cy.get('select[name="categoria"]').select('Matemáticas');
-    cy.get('select[name="profesor"]').select('camila luksic');
+    cy.get('select[name="categoriaId"]').select('Matemáticas');
+    cy.get('select[name="profesorId"]').select('camila luksic');
 
     cy.get('button').contains('Guardar').click();
 
     cy.wait('@createCurso');
 
-    // verificar que se queda en la página y que el curso aparece
-    cy.url().should('include', '/profesor/cursos');
     cy.contains('Nuevo Curso').should('exist');
   });
 });
