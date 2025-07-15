@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { UserCard } from '../components/UserCard';
 import type { UserFormValues } from '../components/UserForm';
 import { UserModal } from '../components/UserModal';
+import { UpdatePasswordModal } from '../components/UpdatePasswordModal';
 import { useCreateUser } from '../hooks/useCreateUser';
 import { useDeleteUser } from '../hooks/useDeleteUser';
 import { useUpdateUser } from '../hooks/useUpdateUser';
+import { useUpdatePassword } from '../hooks/useUpdatePassword';
 import { useUsers } from '../hooks/useUsers';
 import type { User } from '../types/userTypes';
 
@@ -12,10 +14,13 @@ export default function UserListPage() {
     const { data: users, isLoading, error } = useUsers();
     const createUser = useCreateUser();
     const updateUser = useUpdateUser();
+    const updatePassword = useUpdatePassword();
     const deleteUser = useDeleteUser();
 
     const [modalOpen, setModalOpen] = useState(false);
     const [editUser, setEditUser] = useState<User | null>(null);
+    const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+    const [selectedUserForPassword, setSelectedUserForPassword] = useState<User | null>(null);
 
     const handleCreate = (data: UserFormValues) => {
         if (!data.password) {
@@ -29,9 +34,17 @@ export default function UserListPage() {
 
     const handleEdit = (data: UserFormValues) => {
         const { password, ...rest } = data;
-        const payload = password ? { ...rest, password } : rest;
         if (editUser) {
-            updateUser.mutate({ id: editUser.id, input: payload }, { onSuccess: () => setEditUser(null) });
+            updateUser.mutate({ id: editUser.id, input: rest }, { onSuccess: () => setEditUser(null) });
+        }
+    };
+
+    const handleChangePassword = (data: { newPassword: string }) => {
+        if (selectedUserForPassword) {
+            updatePassword.mutate(
+                { id: selectedUserForPassword.id, newPassword: data.newPassword },
+                { onSuccess: () => setPasswordModalOpen(false) }
+            );
         }
     };
 
@@ -41,11 +54,16 @@ export default function UserListPage() {
         }
     };
 
+    const openPasswordModal = (user: User) => {
+        setSelectedUserForPassword(user);
+        setPasswordModalOpen(true);
+    };
+
     return (
         <div className="max-w-5xl mx-auto py-8">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Usuarios</h1>
-                <button className="btn btn-primary" onClick={() => setModalOpen(true)}>
+                <button className="btn btn-primary" onClick={() => setModalOpen(true)} data-cy="new-user-button">
                     + Nuevo Usuario
                 </button>
             </div>
@@ -60,6 +78,7 @@ export default function UserListPage() {
                             key={user.id}
                             user={user}
                             onEdit={() => setEditUser(user)}
+                            onChangePassword={() => openPasswordModal(user)}
                             onDelete={() => handleDelete(user)}
                         />
                     ))}
@@ -85,12 +104,19 @@ export default function UserListPage() {
                         ? {
                             ...editUser,
                             rolId: editUser.rol.id,
-                            password: '',
                         }
                         : undefined
                 }
                 title="Editar Usuario"
                 isEdit
+            />
+            {/* Modal para cambiar contraseña */}
+            <UpdatePasswordModal
+                open={passwordModalOpen}
+                onClose={() => setPasswordModalOpen(false)}
+                onSubmit={handleChangePassword}
+                loading={updatePassword.isPending}
+                userName={selectedUserForPassword ? `${selectedUserForPassword.nombre} ${selectedUserForPassword.apellido}` : undefined}
             />
         </div>
     );

@@ -35,6 +35,7 @@ export const RegisterForm = () => {
                     type="text"
                     label="Nombre de usuario"
                     placeholder="usuario123"
+                    data-cy="username-input"
                     {...register('username')}
                     error={errors.username?.message}
                 />
@@ -44,6 +45,7 @@ export const RegisterForm = () => {
                     options={roleOptions}
                     placeholder={rolesLoading ? "Cargando roles..." : "Selecciona un rol"}
                     disabled={rolesLoading}
+                    data-cy="role-select"
                     {...register('rolId', { valueAsNumber: true })}
                     error={errors.rolId?.message}
                 />
@@ -54,6 +56,7 @@ export const RegisterForm = () => {
                     type="text"
                     label="Nombre"
                     placeholder="Juan"
+                    data-cy="name-input"
                     {...register('nombre')}
                     error={errors.nombre?.message}
                 />
@@ -62,6 +65,7 @@ export const RegisterForm = () => {
                     type="text"
                     label="Apellido"
                     placeholder="Pérez"
+                    data-cy="lastname-input"
                     {...register('apellido')}
                     error={errors.apellido?.message}
                 />
@@ -71,6 +75,7 @@ export const RegisterForm = () => {
                 type="email"
                 label="Email"
                 placeholder="tu@email.com"
+                data-cy="email-input"
                 {...register('email')}
                 error={errors.email?.message}
             />
@@ -80,6 +85,7 @@ export const RegisterForm = () => {
                     type="password"
                     label="Contraseña"
                     placeholder="••••••••"
+                    data-cy="password-input"
                     {...register('password')}
                     error={errors.password?.message}
                 />
@@ -88,13 +94,14 @@ export const RegisterForm = () => {
                     type="password"
                     label="Confirmar contraseña"
                     placeholder="••••••••"
+                    data-cy="confirm-password-input"
                     {...register('confirmPassword')}
                     error={errors.confirmPassword?.message}
                 />
             </div>
 
             {error && (
-                <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
+                <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md" data-cy="error-message">
                     {error}
                 </div>
             )}
@@ -105,6 +112,7 @@ export const RegisterForm = () => {
                 size="lg"
                 className="w-full"
                 disabled={loading || rolesLoading}
+                data-cy="register-button"
             >
                 {loading ? 'Registrando...' : 'Registrarse'}
             </Button>

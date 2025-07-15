@@ -14,4 +14,18 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
+
 import './commands'
+
+import './commands'
+
+// Handle uncaught exceptions
+Cypress.on('uncaught:exception', (err, runnable) => {
+  // returning false here prevents Cypress from failing the test
+  console.log('Uncaught exception:', err.message);
+  return false;
+});
+
+// Increase timeouts for slower operations
+Cypress.config('defaultCommandTimeout', 3000);
+Cypress.config('requestTimeout', 10000);

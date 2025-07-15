@@ -10,7 +10,7 @@ export type AppAbility = Ability<[Actions, Subjects]>;
 export function defineAbilityFor(user: Usuario | null) {
   const { can,cannot, build } = new AbilityBuilder<Ability<[Actions, Subjects]>>(Ability as any);
 
-  if (!user) return build();
+  if (!user || !user.rol) return build();
 
   const { codigo } = user.rol;
 
