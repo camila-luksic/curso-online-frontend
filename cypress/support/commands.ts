@@ -41,6 +41,8 @@
 // Custom commands for Cypress tests
 // ***********************************************
 
+import 'cypress-file-upload';
+
 declare namespace Cypress {
   interface Chainable {
     /**
@@ -48,14 +50,17 @@ declare namespace Cypress {
      * @param email Email del usuario
      * @param password Contraseña del usuario
      */
-    loginByApi(email?: string, password?: string): Chainable<void>;
+    loginByApi(email?: string, password?: string): Chainable;
 
+     attachFile(fileName: string, options?: any): Chainable;
   }
+
+  
 }
 
 const apiUrl = Cypress.env('VITE_API_BASE_URL');
 
-Cypress.Commands.add('loginByApi', (email = 'mateo.valera.asp@gmail.com', password = '123') => {
+Cypress.Commands.add('loginByApi' as any, (email = 'mateo.valera.asp@gmail.com', password = '123') => {
   cy.request({
     method: 'POST',
     url: `${apiUrl}/auth/login`,
